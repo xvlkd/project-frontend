@@ -1,5 +1,5 @@
 <template>
-    <v-data-table :headers="headers" :search="keyword" :items="problems">
+    <v-data-table :headers="headers" :search="keyword" :items="problems" :loading="load">
         <template v-slot:top>
             <v-toolbar>
                 <v-toolbar-title>Problem Record</v-toolbar-title>
@@ -64,6 +64,9 @@
 
                             <v-col cols="12" sm="6">
                                 <v-select
+                                items="kategori"
+                                item-text="category"
+                                item-value="id_problemcategory"
                                 label="Kategori"
                                 v-model="form.category"
                                 ></v-select>
@@ -146,62 +149,39 @@ export default {
         minDate: "2020-01-05",
         maxDate: "2019-08-30",
         headers: [
-            {
-                title:"No",
-                value: "id_problemrecord"
-            },
-            {
-                title:"Tanggal",
-                value:"created_at"
-            },
-            {
-                title:"Masalah",
-                value:"problem"
-            },
-            {
-                title:"Solusi",
-                value:"solution"
-            },
-            {
-                title:"Deskripsi",
-                value:"description"
-
-            },
-            {
-                title:"Petugas",
-                value:"operator"
-            },
-            {
-                title:"Pemeriksa",
-                value:"corrector"
-            },
-            {
-                title:"Pimpinan",
-                value:"supervisor"
-            },
-            {
-                title:"Action",
-                value: "actions",
-                sortable:false,
-            }
+            { text: "No", value: "id_problemrecord" },
+            { text: "Tanggal", value:"created_at" },
+            { text: "Masalah", value:"problem" },
+            { text: "Solusi", value:"solution" },
+            { text: "Deskripsi", value:"description" },
+            { text: "Petugas", value:"operator" },
+            { text: "Pemeriksa", value:"corrector" },
+            { text: "Pimpinan", value:"supervisor" },
+            { text: "Action", value: "actions", sortable:false, }
         ],
+        load :false,
+        problem_categorys : [],
+
         form: {
             problem: "",
             solution: "",
+            id_category: "",
             description: "",
             operator:"",
             corrector:"",
             supervisor:"",
+            id_user: "",
         },
-        problems: new FormData(),
-        typeInput: "new"
+        problems: [],
+        problem: new FormData(),
+        typeInput: "new",
     }),
 
     methods: {
         getData(){
             var uri = this.$apiUrl + "problems";
             this.$http.get(uri, this.problems).then(response => {
-                this.problems = response.data.problems;
+                this.problems = response.data.problem;
             });
         },
 
@@ -213,9 +193,26 @@ export default {
             this.problems.append('corrector', this.form.corrector);
             this.problems.append('supervisor', this.form.supervisor);
 
-            var uri = this.$apiUrl + "problem";
+            var uri = this.$apiUrl + "problems";
             this.load = true;
-            this.$http.post(uri, this.problem).then(this.getData())
+            this.$http
+            .post(uri, this.problem)
+            .then(response => {
+                this.snackbar = true;
+                this.color = "green";
+                this.text = response.data.message;
+                this.load =false;
+                this.dialog = false;
+                this.getData();
+                this.resetForm();
+            })
+            .catch(error => {
+                this.errors = error;
+                this.snackbar = true;
+                this.text = "Try Again";
+                this.color = "red";
+                this.load = false;
+            })
         },
 
         updateData() {
@@ -226,14 +223,54 @@ export default {
             this.problems.append('corrector', this.form.corrector);
             this.problems.append('supervisor', this.form.supervisor);
 
-            var uri = this.$apiUrl + "problems/update/" + this.id_problemrecord;
+            var uri = this.$apiUrl + `problems/${this.id_problemrecord}` ;
             this.load = true;
-            this.$http.post(uri, this.problems).then(this.getData(), this.resetForm(), this.load = false,);
+            this.$http
+            .post(uri, this.problems)
+            .then(response => {
+                this.snackbar = true;
+                this.color = "green";
+                this.text = response.data.message;
+                this.load = false;
+                this.dialog = false;
+                this.getData();
+                this.resetForm();
+                this.typeInput = "new";
+            })
+            .catch(error => {
+                this.errors = error;
+                this.snackbar = true;
+                this.text = "Try Again";
+                this.color = "red";
+                this.load = false;
+                this.dialog = false;
+                this.typeInput = "new";
+            })
         },
 
-        deleteData(id_problemrecord) {
-            var uri = this.$apiUrl + "problems" + id_problemrecord;
-            this.$http.delete(uri, this.problems).then(this.getData(), this.resetForm(), this.load = false,)
+        deleteData() {
+            var uri;
+            if (confirm("Anda yakin menghapus masalah ini?")){
+                uri = this.$apiUrl + "problems/delete/{id_keluhan}" ;
+                this.$http
+                .delete(uri, this.problems)
+                .then(response =>{
+                this.snackbar = true;
+                this.text = response.data.status;
+                this.color = "green";
+                this.getData();
+                })
+                .catch(error => {
+                    this.errors = error;
+                    this.snackbar = true;
+                    this.text = "Try Again";
+                    this.color = "red";
+                });
+            } else {
+                this.snackbar = true;
+                this.text = "Gagal diHapus";
+                this.color = "red";
+            }
         },
 
         editHandler(item) {

@@ -22,7 +22,7 @@
                     </v-list-item>
                     </v-list>
                     
-                </v-menu>
+            </v-menu>
         </v-app-bar>
         <v-navigation-drawer v-model="sidebarMenu" app floating :permanent="sidebarMenu" :mini-variant.sync="mini" color="grey darken-4">
             <v-list dense>
@@ -36,7 +36,7 @@
                 <v-list-item-avatar color="blue">
                     <v-icon>mdi-account-outline</v-icon>
                 </v-list-item-avatar>
-                <v-list-item-content class="text-truncate" > Velika Ibrahim </v-list-item-content>
+                <v-list-item-content class="text-truncate" > Welcome - {{this.name}}</v-list-item-content>
                 <v-btn icon small>
                     <v-icon color="blue">mdi-chevron-left</v-icon>
                 </v-btn>
@@ -73,20 +73,6 @@
 
 <script>
 export default {
-    computed: {
-      mini() {
-          return (this.$vuetify.breakpoint.smAndDown) || this.toggleMini
-      }
-    },
-
-    methods :{
-        logout() {
-            this.$session.destroy();
-            this.$router.push({ name: "Login Page" });
-        }
-    },
-
-
     data: () => ({
         sidebarMenu: true,
         toggleMini: false,
@@ -98,9 +84,11 @@ export default {
             },
             {
                 title: "Log Out",
-                icon: "mdi-exit-to-app"
+                icon: "mdi-exit-to-app",
+                href: "/"
             }
         ],
+        nama: "",
         items : [
             {
                 title: "Home",
@@ -129,5 +117,71 @@ export default {
             }
         ],
     }),
+
+    created() {
+        this.setup;
+    },
+
+    computed: {
+      mini() {
+          return (this.$vuetify.breakpoint.smAndDown) || this.toggleMini
+      }
+    },
+
+    methods :{
+        logout() {
+            this.$session.destroy();
+            this.$router.push({ name: "LoginPage" });
+        }
+    },
 }
 </script>
+
+<style scoped>
+    .theme--dark.v-application {
+        background-color: #181818;
+    }
+
+    .theme--dark.v-card, 
+    .theme--dark.v-data-table,
+    .theme--dark.v-tabs-items,
+    .theme--dark.v-tabs .v-tabs-bar {
+        background-color: #232323;
+    }
+
+    .fade-enter-active, .fade-leave-active {
+    transition-property: opacity;
+    transition-duration: .25s;
+    }
+
+    .fade-enter-active {
+    transition-delay: .25s;
+    }
+
+    .fade-enter, .fade-leave-active {
+    opacity: 0
+    }
+
+    ::-webkit-scrollbar {
+        width: 8px;
+        background-color: #111;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: #222;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background-color: #444;
+    }
+
+    ::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 4px rgba(0,0,0,0.6);
+                box-shadow: inset 0 0 4px rgba(0,0,0,0.6);
+        background-color: #333;
+    }
+
+    ::-webkit-scrollbar-track:hover {
+        background-color: #292929;
+    }
+</style>

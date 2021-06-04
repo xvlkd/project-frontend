@@ -11,12 +11,12 @@ function loadDashboardUser(view) {
 Vue.use(Router);
 
 const routes = [{
-		name: 'Login Page',
+		name: 'LoginPage',
 		path: '/',
 		component: LoginPage
 	},
   {
-    name: "DashboardUser",
+    name: 'DashboardUser',
     path: '/dashboard',
     component: DashboardUser,
 	children: [{

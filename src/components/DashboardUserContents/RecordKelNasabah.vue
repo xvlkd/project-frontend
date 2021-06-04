@@ -144,42 +144,18 @@ export default {
         minDate: "2020-01-05",
         maxDate: "2019-08-30",
         headers: [
-            {
-                title:"ID"
-            },
-            {
-                title:"Tanggal"
-            },
-            {
-                title:"Kantor"
-            },
-            {
-                title:"Mekanisme"
-            },
-            {
-                title:"No Kartu"
-            },
-            {
-                title:"Nama Nasabah"
-            },
-            {
-                title:"Kategori"
-            },
-            {
-                title:"Keterangan"
-            },
-            {
-                title:"Petugas"
-            },
-            {
-                title:"Pemeriksa"
-            },
-            {
-                title:"Pimpinan"
-            },
-            {
-                title:"Action"
-            }
+            { text: "ID" },
+            { text: "Tanggal" },
+            { text: "Kantor" },
+            { text: "Mekanisme" },
+            { text: "No Kartu" },
+            { text: "Nama Nasabah" },
+            { text: "Kategori" },
+            { text: "Keterangan" },
+            { text: "Petugas" },
+            { text: "Pemeriksa" },
+            { text: "Pimpinan" },
+            { text: "Action" }
         ],
     }),
 }

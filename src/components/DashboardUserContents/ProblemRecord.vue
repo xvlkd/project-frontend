@@ -64,7 +64,6 @@
 
                             <v-col cols="12" sm="6">
                                 <v-select
-                                items="kategori"
                                 item-text="category"
                                 item-value="id_problemcategory"
                                 label="Kategori"
@@ -121,7 +120,7 @@
                     <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn color="red darken-1" text @click="dialog=false">Cancel</v-btn>
-                        <v-btn color="blue darken-1" text @click="dialog=false">Save</v-btn>
+                        <v-btn color="blue darken-1" text @click="setForm()">Save</v-btn>
                     </v-card-actions>
                 </v-card>
             </v-dialog>
@@ -172,15 +171,16 @@ export default {
             supervisor:"",
             id_user: "",
         },
-        problems: [],
         problem: new FormData(),
+        problems: [],
+        items: [],
         typeInput: "new",
     }),
 
     methods: {
         getData(){
             var uri = this.$apiUrl + "problems";
-            this.$http.get(uri, this.problems).then(response => {
+            this.$http.get(uri, this.problem).then(response => {
                 this.problems = response.data.problem;
             });
         },

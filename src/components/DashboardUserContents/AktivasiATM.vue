@@ -133,7 +133,7 @@ export default {
         minDate: "2020-01-05",
         maxDate: "2019-08-30",
         headers: [
-            { text: "ID" },
+            { text: "No" },
             { text:"Tanggal" },
             { text:"Nama Nasabah" },
             { text:"Nomor Kartu" },
@@ -145,5 +145,139 @@ export default {
             { text:"Action" }
         ],
     }),
+
+    methods: {
+        getData(){
+            var uri = this.$apiUrl + "aktivasi";
+            this.$http.get(uri).then(response => {
+                this.aktivasi = response.data.problem;
+            });
+        },
+
+        sendData() {
+            this.aktivasi.append('problem', this.form.problem);
+            this.aktivasi.append('solution', this.form.solution);
+            this.aktivasi.append('description', this.form.description);
+            this.aktivasi.append('operator', this.form.operator);
+            this.aktivasi.append('corrector', this.form.corrector);
+            this.aktivasi.append('supervisor', this.form.supervisor);
+
+            var uri = this.$apiUrl + "aktivasi";
+            this.load = true;
+            this.$http
+            .post(uri, this.problem)
+            .then(response => {
+                this.snackbar = true;
+                this.color = "green";
+                this.text = response.data.message;
+                this.load =false;
+                this.dialog = false;
+                this.getData();
+                this.resetForm();
+            })
+            .catch(error => {
+                this.errors = error;
+                this.snackbar = true;
+                this.text = "Try Again";
+                this.color = "red";
+                this.load = false;
+            })
+        },
+
+        updateData() {
+            this.aktivasi.append('problem', this.form.problem);
+            this.aktivasi.append('solution', this.form.solution);
+            this.aktivasi.append('description', this.form.description);
+            this.aktivasi.append('operator', this.form.operator);
+            this.aktivasi.append('corrector', this.form.corrector);
+            this.aktivasi.append('supervisor', this.form.supervisor);
+
+            var uri = this.$apiUrl + `aktivasi/${this.id_problemrecord}` ;
+            this.load = true;
+            this.$http
+            .post(uri, this.aktivasi)
+            .then(response => {
+                this.snackbar = true;
+                this.color = "green";
+                this.text = response.data.message;
+                this.load = false;
+                this.dialog = false;
+                this.getData();
+                this.resetForm();
+                this.typeInput = "new";
+            })
+            .catch(error => {
+                this.errors = error;
+                this.snackbar = true;
+                this.text = "Try Again";
+                this.color = "red";
+                this.load = false;
+                this.dialog = false;
+                this.typeInput = "new";
+            })
+        },
+
+        deleteData() {
+            var uri;
+            if (confirm("Anda yakin menghapus masalah ini?")){
+                uri = this.$apiUrl + "aktivasi/delete/{id_aktivasi}" ;
+                this.$http
+                .delete(uri, this.aktivasi)
+                .then(response =>{
+                this.snackbar = true;
+                this.text = response.data.status;
+                this.color = "green";
+                this.getData();
+                })
+                .catch(error => {
+                    this.errors = error;
+                    this.snackbar = true;
+                    this.text = "Try Again";
+                    this.color = "red";
+                });
+            } else {
+                this.snackbar = true;
+                this.text = "Gagal diHapus";
+                this.color = "red";
+            }
+        },
+
+        editHandler(item) {
+            this.typeInput = "edit";
+            this.dialog = true;
+            this.id_aktivasi = item.id_aktivasi;
+            this.problem = item.problem;
+            this.solution = item.solution;
+            this.description = item.solution;
+            this.operator = item.operator;
+            this.corrector = item.corrector;
+            this.supervisor = item.supervisor;
+        },
+
+        setForm() {
+            if (this.typeInput === "new") {
+                this.sendData();
+                this.dialog = false;
+            } else {
+                this.updateData();
+                this.dialog = false;
+            }
+        },
+
+        resetForm() {
+            this.form = {
+                problem: "",
+                solution: "",
+                description: "",
+                operator: "",
+                corrector: "",
+                supervisor: ""
+            };
+        },
+    },
+
+    mounted() {
+        this.getData();
+    }
 }
 </script>

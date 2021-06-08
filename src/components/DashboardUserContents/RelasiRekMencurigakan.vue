@@ -151,7 +151,7 @@ export default {
         minDate: "2020-01-05",
         maxDate: "2019-08-30",
         headers: [
-            { text: "ID" },
+            { text: "No" },
             { text: "Tanggal" },
             { text: "Kategori" },
             { text: "Mekanisme" },

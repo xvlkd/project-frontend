@@ -36,7 +36,7 @@
                 <v-list-item-avatar color="blue">
                     <v-icon>mdi-account-outline</v-icon>
                 </v-list-item-avatar>
-                <v-list-item-content class="text-truncate" > Welcome - {{this.name}}</v-list-item-content>
+                <v-list-item-content class="text-truncate" > Welcome - {{users.name}}</v-list-item-content>
                 <v-btn icon small>
                     <v-icon color="blue">mdi-chevron-left</v-icon>
                 </v-btn>
@@ -72,8 +72,12 @@
 </template>
 
 <script>
+import Axios from 'axios'
 export default {
     data: () => ({
+        loggedIn: localStorage.getItem('loggedIn'),
+        token: localStorage.getItem('token'),
+        users: [],
         sidebarMenu: true,
         toggleMini: false,
         menus : [
@@ -88,7 +92,7 @@ export default {
                 href: "/"
             }
         ],
-        nama: "",
+        name: "",
         items : [
             {
                 title: "Home",
@@ -119,7 +123,11 @@ export default {
     }),
 
     created() {
-        this.setup;
+        Axios.get('http://localhost:8000/api/user', {headers: {'Authorization': 'Bearer '+this.token}})
+        .then(response => {
+            console.log(response)
+            this.user = response.data // assign response to state user
+        })
     },
 
     computed: {
@@ -130,10 +138,14 @@ export default {
 
     methods :{
         logout() {
-            this.$session.destroy();
-            this.$router.push({ name: "LoginPage" });
+            Axios.get('http://localhost:8000/api/logout')
+            .then(() => {
+                localStorage.removeItem("loggedIn")
+                return this.$router.push({ name: 'LoginPage' })
+            })
         }
-    },
+    }
+
 }
 </script>
 

@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
+import Vuex from 'vuex';
 
 const LoginPage = () => import('../components/LoginPage.vue');
 const DashboardUser = () => import('../components/DashboardUser.vue');
@@ -8,6 +9,7 @@ function loadDashboardUser(view) {
 	return () => import(`../components/DashboardUserContents/${view}.vue`)
 }
 
+Vue.use(Vuex);
 Vue.use(Router);
 
 const routes = [{

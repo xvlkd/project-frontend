@@ -18,6 +18,7 @@ Vue.prototype.$apiUrl = 'http://localhost:8000/api/';
 
 Vue.config.productionTip = false;
 
+
 new Vue({
 	render: (h) => h(App),
 	vuetify,

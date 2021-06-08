@@ -1,6 +1,6 @@
 <template>
   <v-app id="inspire">
-    <v-content>
+    <v-main>
       <v-container class="fill-height" fluid>
         <v-row align="center" justify="center">
           <v-col cols="12" sm="8" md="4">
@@ -44,17 +44,23 @@
           <v-btn dark text @click="snackbar=false">Close</v-btn>
         </v-snackbar>
       </v-container>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 
 <script>
+import Axios from 'axios'
 export default {
+  name: 'Login',
   data: () => ({
     form: {
       username: "",
       password: ""
     },
+    loggedIn: localStorage.getItem('loggedIn'),
+    token: localStorage.getItem('token'),
+    validation: [],
+    loginFailed: null,
     snackbar: false,
     color: null,
     text: "",
@@ -65,28 +71,50 @@ export default {
 
   methods: {
     login() {
-      this.user.append("username", this.form.username);
-      this.user.append("password", this.form.password);
-      var uri = this.$apiUrl + "login";
-      this.$http
-        .post(uri, this.user)
-        .then(response => {
-          this.snackbar = true; //mengaktifkan snackbar
-          this.color = "green"; //memberi warna snackbar
-          this.text = response.data.message; //memasukkan pesan kesnackbar
+      if(this.form.username && this.form.password){
+        Axios.get('http://localhost:8000/sanctum/csrf-cookie')
+         .then(response => {
+           console.log(response)
+           Axios.post('http://localhost:8000/api/login', {
+             username: this.form.username,
+             password: this.form.password
+             }).then(res => {
+               console.log(res)
+               if (res.data.success) {
+                 localStorage.setItem("loggedIn", "true");
+                 localStorage.setItem("token", res.data.token);
+                 this.loggedIn = true;
+                 this.snackbar = true;
+                 this.color = "green";
+                 this.text = response.data.message;
+                 return this.$router.push({name: "DashboardUser" });
+                 } else {
+                   this.loginFailed = true
+                   }
+                   }).catch(error => {
+                     console.log(error)
+                     this.errors = error;
+                      this.snackbar = true;
+                      this.text = "Try Again";
+                      this.color = "red";
+                   })
+             })
+       }
+       this.validation = []
+       
+       if (!this.form.username) {
+         this.validation.username = true
+         }
+         if (!this.form.password) {
+           this.validation.password = true
+           }
+          }
+          },
 
-          this.$session.start();
-          this.$router.push({ name: "DashboardUser"});
-
-        })
-        .catch(error => {
-          console.log("err", error);
-          this.errors = error;
-          this.snackbar = true;
-          this.text = "Try Again";
-          this.color = "red";
-        });
-    }
-  }
-};
+        mounted() {
+            if (this.loggedIn) {
+                this.$router.push({ name: "DashboardUser" })
+            }
+        }
+      }
 </script>

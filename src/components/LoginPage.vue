@@ -78,11 +78,11 @@ export default {
            Axios.post('http://localhost:8000/api/login', {
              username: this.form.username,
              password: this.form.password
-             }).then(res => {
-               console.log(res)
-               if (res.data.success) {
-                 localStorage.setItem("loggedIn", "true");
-                 localStorage.setItem("token", res.data.token);
+             }).then(response => {
+               console.log(response)
+               if (response.data.success) {
+                 localStorage.setItem('loggedIn', 'true');
+                 localStorage.setItem('token', response.data.token);
                  this.loggedIn = true;
                  this.snackbar = true;
                  this.color = "green";
@@ -104,17 +104,17 @@ export default {
        
        if (!this.form.username) {
          this.validation.username = true
-         }
-         if (!this.form.password) {
-           this.validation.password = true
-           }
-          }
-          },
+       }
+       if (!this.form.password) {
+         this.validation.password = true
+       }
+    }
+  },
 
-        mounted() {
-            if (this.loggedIn) {
-                this.$router.push({ name: "DashboardUser" })
-            }
-        }
+  mounted() {
+    if (this.loggedIn) {
+      return this.$router.push({ name: "DashboardUser" });
+      }
+      }
       }
 </script>

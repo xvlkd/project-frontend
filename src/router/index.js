@@ -15,7 +15,7 @@ Vue.use(Router);
 const routes = [{
 		name: 'LoginPage',
 		path: '/',
-		component: LoginPage
+		component: LoginPage,
 	},
   {
     name: 'DashboardUser',

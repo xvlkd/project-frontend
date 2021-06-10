@@ -7,21 +7,21 @@
             >
             <v-col cols="6">
                 <v-text-field
-                    label="Current Password"
+                    label="Password Sebelumnya"
                     required
                 ></v-text-field>
             </v-col>
         
             <v-col cols="6">
                 <v-text-field
-                    label="New Password"
+                    label="Password Baru"
                     required
                 ></v-text-field>
             </v-col>
 
             <v-col cols="6">
                 <v-text-field
-                    label="Confirm Password"
+                    label="Masukkan Password Kembali"
                     required
                 ></v-text-field>
             </v-col>

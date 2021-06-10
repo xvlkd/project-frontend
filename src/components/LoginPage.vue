@@ -28,6 +28,7 @@
                     :type="value ? 'text' : 'password'"
                     @click:append="value = !value"
                   />
+
                 </v-form>
               </v-card-text>
 
@@ -57,16 +58,15 @@ export default {
       username: "",
       password: ""
     },
-    loggedIn: localStorage.getItem('loggedIn'),
-    token: localStorage.getItem('token'),
-    validation: [],
-    loginFailed: null,
+    loggedIn: localStorage.getItem("loggedIn"),
+    token: localStorage.getItem("token"),
     snackbar: false,
     color: null,
     text: "",
     users: [],
     user: new FormData(),
     value: false
+
   }),
 
   methods: {
@@ -75,38 +75,25 @@ export default {
         Axios.get('http://localhost:8000/sanctum/csrf-cookie')
          .then(response => {
            console.log(response)
-           Axios.post('http://localhost:8000/api/login', {
+           this.$http.post('login', {
              username: this.form.username,
              password: this.form.password
              }).then(response => {
-               console.log(response)
-               if (response.data.success) {
-                 localStorage.setItem('loggedIn', 'true');
-                 localStorage.setItem('token', response.data.token);
-                 this.loggedIn = true;
+               console.log(response);
+               localStorage.setItem("loggedIn", "true");
+               localStorage.setItem("token", response.data.token);
+               this.snackbar = true;
+               this.color = "green";
+               this.text = response.data.messege;
+               return this.$router.push({name: "DashboardUser" });
+               }).catch(error => {
+                 console.log(error);
+                 this.errors = error;
                  this.snackbar = true;
-                 this.color = "green";
-                 this.text = response.data.message;
-                 return this.$router.push({name: "DashboardUser" });
-                 } else {
-                   this.loginFailed = true
-                   }
-                   }).catch(error => {
-                     console.log(error)
-                     this.errors = error;
-                      this.snackbar = true;
-                      this.text = "Try Again";
-                      this.color = "red";
-                   })
-             })
-       }
-       this.validation = []
-       
-       if (!this.form.username) {
-         this.validation.username = true
-       }
-       if (!this.form.password) {
-         this.validation.password = true
+                 this.text = "Try Again";
+                 this.color = "red";
+                 })
+            })
        }
     }
   },

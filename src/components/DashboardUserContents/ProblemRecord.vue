@@ -1,5 +1,5 @@
 <template>
-    <v-data-table :headers="headers" :search="keyword" items="problems" :loading="load">
+    <v-data-table :headers="headers" :search="keyword" :items="problems" :loading="load">
         <template v-slot:top>
             <v-toolbar>
                 <v-toolbar-title>Problem Record</v-toolbar-title>
@@ -148,14 +148,14 @@ export default {
         minDate: "2020-01-05",
         maxDate: "2019-08-30",
         headers: [
-            { text: "No", value: "id_problemrecord" },
-            { text: "Tanggal", value:"created_at" },
-            { text: "Masalah", value:"problem" },
-            { text: "Solusi", value:"solution" },
-            { text: "Deskripsi", value:"description" },
-            { text: "Petugas", value:"operator" },
-            { text: "Pemeriksa", value:"corrector" },
-            { text: "Pimpinan", value:"supervisor" },
+            { text: "No", value:'id_problemrecord' },
+            { text: "Tanggal", value:'created_at' },
+            { text: "Masalah", value:'problem' },
+            { text: "Solusi", value:'solution' },
+            { text: "Deskripsi", value:'description' },
+            { text: "Petugas", value:'operator' },
+            { text: "Pemeriksa", value:'corrector' },
+            { text: "Pimpinan", value:'supervisor' },
             { text: "Action", value: "actions", sortable:false, }
         ],
         load :false,
@@ -173,7 +173,6 @@ export default {
         },
         problem: new FormData(),
         problems: [],
-        items: [],
         token: localStorage.getItem('token'),
         typeInput: "new",
     }),
@@ -181,11 +180,11 @@ export default {
     methods: {
         getData(){
             var config = {
-                headers: {'Authorization': 'Bearer '+ localStorage.getItem("token")}
+                headers: {'Authorization': 'Bearer '+ localStorage.getItem('token')}
             }
             var uri = this.$apiUrl + 'problems';
             this.$http.get(uri, this.problem, config).then(response => {
-                this.problems = response.data;
+                this.problems = response.data.message;
             });
         },
 
@@ -197,10 +196,14 @@ export default {
             this.problems.append('corrector', this.form.corrector);
             this.problems.append('supervisor', this.form.supervisor);
 
+            var config = {
+                headers: {'Authorization': 'Bearer' +localStorage.getItem('token')}
+            }
+
             var uri = this.$apiUrl + "problems";
             this.load = true;
             this.$http
-            .post(uri, this.problem)
+            .post(uri, this.problem, config)
             .then(response => {
                 this.snackbar = true;
                 this.color = "green";
@@ -227,10 +230,14 @@ export default {
             this.problems.append('corrector', this.form.corrector);
             this.problems.append('supervisor', this.form.supervisor);
 
-            var uri = this.$apiUrl + `problems/${this.id_problemrecord}` ;
+            var config = {
+                headers: { 'Authorization' :'Bearer' +localStorage.getItem('token')}
+            }
+
+            var uri = this.$apiUrl + `problems/${this.id_problemrecord}`;
             this.load = true;
             this.$http
-            .post(uri, this.problems)
+            .post(uri, this.problems, config)
             .then(response => {
                 this.snackbar = true;
                 this.color = "green";
@@ -254,10 +261,13 @@ export default {
 
         deleteData() {
             var uri;
+            var config = {
+                headers: { 'Authorization' :'Bearer' +localStorage.getItem('token')}
+            }
             if (confirm("Anda yakin menghapus masalah ini?")){
                 uri = this.$apiUrl + "problems/delete/{id_keluhan}" ;
                 this.$http
-                .delete(uri, this.problems)
+                .delete(uri, this.problems, config)
                 .then(response =>{
                 this.snackbar = true;
                 this.text = response.data.status;

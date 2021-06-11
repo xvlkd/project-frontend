@@ -1,5 +1,5 @@
 <template>
-    <v-data-table :headers="headers" :search="keyword" :items="problems" :loading="load">
+<v-data-table :headers="headers" :search="keyword" :items="problems" :loading="load">
         <template v-slot:top>
             <v-toolbar>
                 <v-toolbar-title>Problem Record</v-toolbar-title>
@@ -158,9 +158,6 @@ export default {
             { text: "Pimpinan", value:'supervisor' },
             { text: "Action", value: "actions", sortable:false, }
         ],
-        load :false,
-        problem_categorys : [],
-
         form: {
             problem: "",
             solution: "",
@@ -175,6 +172,8 @@ export default {
         problems: [],
         token: localStorage.getItem('token'),
         typeInput: "new",
+        load :false,
+        problem_categorys : [],
     }),
 
     methods: {
@@ -183,8 +182,8 @@ export default {
                 headers: {'Authorization': 'Bearer '+ localStorage.getItem('token')}
             }
             var uri = this.$apiUrl + 'problems';
-            this.$http.get(uri, this.problem, config).then(response => {
-                this.problems = response.data.message;
+            this.$http.get(uri, config).then(response => {
+                this.problems = response.data.message
             });
         },
 

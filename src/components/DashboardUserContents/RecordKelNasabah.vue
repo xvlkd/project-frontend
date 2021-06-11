@@ -1,5 +1,5 @@
 <template>
-    <v-data-table :headers="headers" :search="keyword">
+    <v-data-table :headers="headers" :search="keyword" :items="keluhans">
         <template v-slot:top>
             <v-toolbar>
                 <v-toolbar-title>Keluhan Nasabah</v-toolbar-title>
@@ -144,19 +144,174 @@ export default {
         minDate: "2020-01-05",
         maxDate: "2019-08-30",
         headers: [
-            { text: "No" },
-            { text: "Tanggal" },
-            { text: "Kantor" },
-            { text: "Mekanisme" },
-            { text: "No Kartu" },
-            { text: "Nama Nasabah" },
-            { text: "Kategori" },
-            { text: "Keterangan" },
-            { text: "Petugas" },
-            { text: "Pemeriksa" },
-            { text: "Pimpinan" },
+            { text: "No", value:"id_keluhan" },
+            { text: "Tanggal", value:"created_at" },
+            { text: "Kantor", value:"asal_keluhan" },
+            { text: "Mekanisme", value:"procedure" },
+            { text: "No Kartu", value:"card_number" },
+            { text: "Nama Nasabah", value:"account_name" },
+            { text: "Kategori", value:"" },
+            { text: "Keterangan", value:"problem_solution" },
+            { text: "Petugas", value:"operator" },
+            { text: "Pemeriksa", value:"corrector" },
+            { text: "Pimpinan", value:"supervisor" },
             { text: "Action" }
         ],
+
+        keluhan: new FormData(),
+        keluhans: [],
+        token: localStorage.getItem('token'),
+        typeInput: "new",
+        load :false,
     }),
+
+    methods: {
+        getData(){
+            var config = {
+                headers: {'Authorization': 'Bearer '+ localStorage.getItem('token')}
+            }
+            var uri = this.$apiUrl + 'keluhan';
+            this.$http.get(uri, config).then(response => {
+                this.keluhans = response.data.message
+            });
+        },
+
+        sendData() {
+            this.keluhan.append('problem', this.form.problem);
+            this.keluhan.append('solution', this.form.solution);
+            this.keluhan.append('description', this.form.description);
+            this.keluhan.append('operator', this.form.operator);
+            this.keluhan.append('corrector', this.form.corrector);
+            this.keluhan.append('supervisor', this.form.supervisor);
+
+            var config = {
+                headers: {'Authorization': 'Bearer' +localStorage.getItem('token')}
+            }
+
+            var uri = this.$apiUrl + "keluhan";
+            this.load = true;
+            this.$http
+            .post(uri, this.problem, config)
+            .then(response => {
+                this.snackbar = true;
+                this.color = "green";
+                this.text = response.data.message;
+                this.load =false;
+                this.dialog = false;
+                this.getData();
+                this.resetForm();
+            })
+            .catch(error => {
+                this.errors = error;
+                this.snackbar = true;
+                this.text = "Try Again";
+                this.color = "red";
+                this.load = false;
+            })
+        },
+
+        updateData() {
+            this.keluhan.append('problem', this.form.problem);
+            this.keluhan.append('solution', this.form.solution);
+            this.keluhan.append('description', this.form.description);
+            this.keluhan.append('operator', this.form.operator);
+            this.keluhan.append('corrector', this.form.corrector);
+            this.keluhan.append('supervisor', this.form.supervisor);
+
+            var config = {
+                headers: { 'Authorization' :'Bearer' +localStorage.getItem('token')}
+            }
+
+            var uri = this.$apiUrl + `keluhan/${this.id_problemrecord}`;
+            this.load = true;
+            this.$http
+            .post(uri, this.keluhan, config)
+            .then(response => {
+                this.snackbar = true;
+                this.color = "green";
+                this.text = response.data.message;
+                this.load = false;
+                this.dialog = false;
+                this.getData();
+                this.resetForm();
+                this.typeInput = "new";
+            })
+            .catch(error => {
+                this.errors = error;
+                this.snackbar = true;
+                this.text = "Try Again";
+                this.color = "red";
+                this.load = false;
+                this.dialog = false;
+                this.typeInput = "new";
+            })
+        },
+
+        deleteData() {
+            var uri;
+            var config = {
+                headers: { 'Authorization' :'Bearer' +localStorage.getItem('token')}
+            }
+            if (confirm("Anda yakin menghapus masalah ini?")){
+                uri = this.$apiUrl + "keluhan/delete/{id_keluhan}" ;
+                this.$http
+                .delete(uri, this.keluhan, config)
+                .then(response =>{
+                this.snackbar = true;
+                this.text = response.data.status;
+                this.color = "green";
+                this.getData();
+                })
+                .catch(error => {
+                    this.errors = error;
+                    this.snackbar = true;
+                    this.text = "Try Again";
+                    this.color = "red";
+                });
+            } else {
+                this.snackbar = true;
+                this.text = "Gagal diHapus";
+                this.color = "red";
+            }
+        },
+
+        editHandler(item) {
+            this.typeInput = "edit";
+            this.dialog = true;
+            this.id_problemrecord = item.id_problemrecord;
+            this.problem = item.problem;
+            this.solution = item.solution;
+            this.description = item.solution;
+            this.operator = item.operator;
+            this.corrector = item.corrector;
+            this.supervisor = item.supervisor;
+        },
+
+        setForm() {
+            if (this.typeInput === "new") {
+                this.sendData();
+                this.dialog = false;
+            } else {
+                this.updateData();
+                this.dialog = false;
+            }
+        },
+
+        resetForm() {
+            this.form = {
+                problem: "",
+                solution: "",
+                description: "",
+                operator: "",
+                corrector: "",
+                supervisor: ""
+            };
+        },
+    },
+    
+
+    mounted() {
+        this.getData();
+    }
 }
 </script>

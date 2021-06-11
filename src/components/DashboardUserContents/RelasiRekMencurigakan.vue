@@ -163,6 +163,160 @@ export default {
             { text: "Pimpinan" },
             { text: "Action" }
         ],
+        relasirek: new FormData(),
+        relasireks: [],
+        token: localStorage.getItem('token'),
+        typeInput: "new",
+        load :false,
     }),
+
+    methods: {
+        getData(){
+            var config = {
+                headers: {'Authorization': 'Bearer '+ localStorage.getItem('token')}
+            }
+            var uri = this.$apiUrl + 'relasirek';
+            this.$http.get(uri, config).then(response => {
+                this.keluhans = response.data.message
+            });
+        },
+
+        sendData() {
+            this.relasirek.append('problem', this.form.problem);
+            this.relasirek.append('solution', this.form.solution);
+            this.relasirek.append('description', this.form.description);
+            this.relasirek.append('operator', this.form.operator);
+            this.relasirek.append('corrector', this.form.corrector);
+            this.relasirek.append('supervisor', this.form.supervisor);
+
+            var config = {
+                headers: {'Authorization': 'Bearer' +localStorage.getItem('token')}
+            }
+
+            var uri = this.$apiUrl + "relasirek";
+            this.load = true;
+            this.$http
+            .post(uri, this.problem, config)
+            .then(response => {
+                this.snackbar = true;
+                this.color = "green";
+                this.text = response.data.message;
+                this.load =false;
+                this.dialog = false;
+                this.getData();
+                this.resetForm();
+            })
+            .catch(error => {
+                this.errors = error;
+                this.snackbar = true;
+                this.text = "Try Again";
+                this.color = "red";
+                this.load = false;
+            })
+        },
+
+        updateData() {
+            this.relasirek.append('problem', this.form.problem);
+            this.relasirek.append('solution', this.form.solution);
+            this.relasirek.append('description', this.form.description);
+            this.relasirek.append('operator', this.form.operator);
+            this.relasirek.append('corrector', this.form.corrector);
+            this.relasirek.append('supervisor', this.form.supervisor);
+
+            var config = {
+                headers: { 'Authorization' :'Bearer' +localStorage.getItem('token')}
+            }
+
+            var uri = this.$apiUrl + `relasirek/${this.id_problemrecord}`;
+            this.load = true;
+            this.$http
+            .post(uri, this.relasirek, config)
+            .then(response => {
+                this.snackbar = true;
+                this.color = "green";
+                this.text = response.data.message;
+                this.load = false;
+                this.dialog = false;
+                this.getData();
+                this.resetForm();
+                this.typeInput = "new";
+            })
+            .catch(error => {
+                this.errors = error;
+                this.snackbar = true;
+                this.text = "Try Again";
+                this.color = "red";
+                this.load = false;
+                this.dialog = false;
+                this.typeInput = "new";
+            })
+        },
+
+        deleteData() {
+            var uri;
+            var config = {
+                headers: { 'Authorization' :'Bearer' +localStorage.getItem('token')}
+            }
+            if (confirm("Anda yakin menghapus masalah ini?")){
+                uri = this.$apiUrl + "relasirek/delete/{id_keluhan}" ;
+                this.$http
+                .delete(uri, this.relasirek, config)
+                .then(response =>{
+                this.snackbar = true;
+                this.text = response.data.status;
+                this.color = "green";
+                this.getData();
+                })
+                .catch(error => {
+                    this.errors = error;
+                    this.snackbar = true;
+                    this.text = "Try Again";
+                    this.color = "red";
+                });
+            } else {
+                this.snackbar = true;
+                this.text = "Gagal diHapus";
+                this.color = "red";
+            }
+        },
+
+        editHandler(item) {
+            this.typeInput = "edit";
+            this.dialog = true;
+            this.id_problemrecord = item.id_problemrecord;
+            this.problem = item.problem;
+            this.solution = item.solution;
+            this.description = item.solution;
+            this.operator = item.operator;
+            this.corrector = item.corrector;
+            this.supervisor = item.supervisor;
+        },
+
+        setForm() {
+            if (this.typeInput === "new") {
+                this.sendData();
+                this.dialog = false;
+            } else {
+                this.updateData();
+                this.dialog = false;
+            }
+        },
+
+        resetForm() {
+            this.form = {
+                problem: "",
+                solution: "",
+                description: "",
+                operator: "",
+                corrector: "",
+                supervisor: ""
+            };
+        },
+    },
+    
+
+    mounted() {
+        this.getData();
+    }
 }
 </script>

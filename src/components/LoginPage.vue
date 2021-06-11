@@ -80,11 +80,12 @@ export default {
              password: this.form.password
              }).then(response => {
                console.log(response);
-               localStorage.setItem("loggedIn", "true");
-               localStorage.setItem("token", response.data.token);
+               
                this.snackbar = true;
                this.color = "green";
                this.text = response.data.messege;
+               localStorage.setItem("loggedIn", "true");
+               localStorage.setItem("token", response.data.token);
                return this.$router.push({name: "DashboardUser" });
                }).catch(error => {
                  console.log(error);
